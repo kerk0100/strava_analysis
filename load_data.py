@@ -5,7 +5,7 @@ import json
 import operator
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
+# loads activities from strava
 def load():
 
     auth_url = "https://www.strava.com/oauth/token"
@@ -48,9 +48,9 @@ def distance(dist, type, operand, activity_data):
     op_func = ops[operand]
     for page in activity_data:
         for i in page:
-            if i["type"]== type:
-                if op_func(i["distance"], dist):
-                # if i["distance"] > dist:
+            # filters through types, or processes all if user didn't select a type
+            if i["type"]== type or type == "--":
+                if op_func(i["distance"], dist) or operand == "--":
                     if type == 'Swim':
                         km = str(i["distance"]) + " m"
                     else:

@@ -166,9 +166,7 @@
     border-top: 30px dotted var(--secondary-color);
     /* color: #fff; */
     /* background-color: var(--primary-color); */
-    /* height: 100%; */
-    background: linear-gradient(90deg, pink 50%, cyan 50%);
-    /* height: 1px; */
+    height: 1px;
     width: 100%;  
     /* float: left;     */
     margin: -20px;
@@ -368,7 +366,6 @@
   }
 
 
-
   /*---------------------------------------
      PROJECT              
   -----------------------------------------*/
@@ -384,17 +381,6 @@
   .project-wrapper img {
     border-radius: var(--border-radius-small);
   }
-
-  /* .project-info {
-    background: var(--white-color);
-    border-radius: var(--border-radius-small);
-    position: absolute;
-    bottom: 32px;
-    right: 32px;
-    left: 32px;
-    width: 90%;
-    padding: 32px;
-  } */
 
   .project-info small {
     font-family: Plain-Bold;
@@ -481,7 +467,7 @@
       ABOUT            
   -----------------------------------------*/
 
-  .about {
+  /* .about {
     position: relative;
     overflow: hidden;
   }
@@ -489,7 +475,7 @@
   .about-image img {
     display: block;
     margin: 0 auto;
-  }
+  } */
 
 
 
@@ -538,38 +524,6 @@
   .blog-sidebar h3 {
     font-size: 18px;
   }
-
-
-
-  /*---------------------------------------
-     CONTACT              
-  -----------------------------------------*/
-
-  /* .newsletter-form .form-control,
-  .contact-form .form-control {
-    box-shadow: none;
-    background: var(--project-bg);
-    border: 0;
-    padding: 1.7em 1.3em;
-    margin: 14px 0;
-  }
-
-  .newsletter-form button,
-  .contact-form #submit-button {
-    background: var(--primary-color);
-    border-radius: var(--border-radius-large);
-    color: var(--white-color);
-    cursor: pointer;
-    font-size: var(--p-font-size);
-    line-height: 0px;
-    padding: 1.5em 1.3em;
-  }
-
-  .newsletter-form button {
-    background: var(--secondary-color);
-  } */
-
-
 
   /*---------------------------------------
      FOOTER              
@@ -635,18 +589,6 @@
 
     .nav-link {
       display: inline-block;
-    }
-
-    /* .navbar-expand-lg .navbar-nav .nav-link.contact {
-      margin: 1em 0;
-    } */
-
-    .copyright-text, 
-    .footer-link, 
-    .site-footer .social-icon {
-      margin-top: 3em;
-      padding: 0;
-      text-align: left;
     }
   }
 
