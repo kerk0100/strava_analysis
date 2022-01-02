@@ -48,7 +48,29 @@
         </div>
     </nav>
 
-    <hr>
+    <!-- <hr> -->
+
+    <section class="hero hero-bg d-flex justify-content-center align-items-center">
+      <div class="container">
+           <div class="row">
+
+               <div class="col-lg-6 col-md-10 col-12 d-flex flex-column justify-content-center align-items-center">
+                     <div class="hero-text">
+
+                          <h1 class="text-white" data-aos="fade-up">Filter through your activities by selecting criteria below.</h1>
+                     </div>
+               </div>
+
+               <div class="col-lg-6 col-12">
+                 <div class="hero-image" data-aos="fade-up" data-aos-delay="300">
+
+                   <img src="static/images/circle.png" class="img-fluid" alt="circle">
+                 </div>
+               </div>
+
+           </div>
+      </div>
+    </section>
 
     <section class="blog section-padding">
       <div class="container">
@@ -74,16 +96,52 @@
             <option>&lt</option>
           </select>
 
-          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance</span> </label>
+          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance (km)</span> </label>
           <input type="text" id="dist" name="dist"><br>
 
-          <input type="submit" value="Submit">
+          <input type="submit" value="Submit" class="btn btn-primary float-right" style="margin: -40px 280px 0px 0" background-color=#FC6100>
           
         </div>
 
-    </form>
-  </div>
-</section>
+      </form>
+      </div>
+
+      <br>
+
+      <div class="container">
+
+        <form action="{{ url_for('filtering')}}" method="post">
+   
+          <div class="select-box">
+            
+            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose activity</span> </label>
+            <select id="selectType" name="selectType">
+              
+              <option>--</option>
+              <option>Run</option>
+              <option>Ride</option>
+              <option>Swim</option>
+            </select>
+  
+            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose operand</span> </label>
+            <select id="selectOp" name="selectOp">
+              <option>--</option>
+              <option>&gt</option>
+              <option>=</option>
+              <option>&lt</option>
+            </select>
+  
+            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose pace (min/km)</span> </label>
+            <input type="text" id="dist" name="dist"><br>
+  
+            <input type="submit" value="Submit" class="btn btn-primary float-right" style="margin: -40px 280px 0px 0" background-color="#FC6100">
+            
+          </div>
+  
+        </form>
+      </div>
+
+    </section>
          
 
  <footer class="site-footer">
