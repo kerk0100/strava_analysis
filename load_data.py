@@ -6,20 +6,23 @@ import operator
 import csv
 import sys
 import pickle
+import pandas as pd
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 csv.field_size_limit(sys.maxsize)
 
 # loads activities from strava
-def load():
+def load(id,secret,refresh):
 
     auth_url = "https://www.strava.com/oauth/token"
     activites_url = "https://www.strava.com/api/v3/athlete/activities"
-
+    # 'client_id': "75915",
+    # 'client_secret': 'b4643a48bc4f66df4dab4a90d700f2b880dca4bf',
+    # 'refresh_token': 'e31b4e175850de6dce0393d64fd7c0e2023b6f54',
     payload = {
-        'client_id': "75915",
-        'client_secret': 'b4643a48bc4f66df4dab4a90d700f2b880dca4bf',
-        'refresh_token': 'e31b4e175850de6dce0393d64fd7c0e2023b6f54',
+        'client_id': str(id),
+        'client_secret': str(secret),
+        'refresh_token': str(refresh),
         'grant_type': "refresh_token",
         'f': 'json'
     }
@@ -46,26 +49,35 @@ def load():
 # filters activities by distance specified by user
 def distance(dist, type, operand, activity_data):
     activities = []
+    column_names = ["Name", "Distance"]
+    df = pd.DataFrame(columns = column_names)
     
     ops = {
         ">": operator.gt,
         "<": operator.lt,
         "=": operator.eq
-    }   
-    op_func = ops[operand]
+    }
+    if operand != "--":
+        op_func = ops[operand]
     for page in activity_data:
         for i in page:
-            # TODO: round the "equals" operand to nearest km
             # TODO: let user choose what metrics they want to see
             # TODO: option to save output to csv for further analysis
             # TODO: 3 years in sport, compare years
             # filters through types, or processes all if user didn't select a type
             if i["type"]== type or type == "--":
-                if op_func(i["distance"], dist) or operand == "--":
+                # rounding so that output is to the nearest .1 km for equals operand
+                if operand == "=":
+                    round_dist = round(i["distance"], -2)
+                else:
+                    round_dist = i["distance"]
+                if operand == "--" or op_func(round_dist, dist):
                     if type == 'Swim':
                         km = str(i["distance"]) + " m"
                     else:
-                        km = str(i["distance"] / 1000) + " km"
-                    result = i["name"] + " --> " + km
+                        km = str(round(i["distance"] / 1000, 2)) + " km"
+                    df.loc[df.shape[0]] = [i["name"], km ]
+                    result = i["name"] + km
                     activities.append(result)
-    return activities
+    # return activities
+    return df
