@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Login Form Example</title>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+  <link rel="stylesheet" href="static/css/style.css">
+
+</head>
+
+<body>
+  <div class="login-form">
+    <form action="{{ url_for('login')}}" method="post">
+      <h1>Enter Strava Credentials</h1>
+      <div class="content">
+        <div class="input-field">
+          <input type="client_id" placeholder="Client ID">
+        </div>
+        <div class="input-field">
+          <input type="client_secret" placeholder="Client Secret">
+        </div>
+        <div class="input-field">
+          <input type="refresh_token" placeholder="Refresh Token">
+        </div>
+      </div>
+      <div class="action">
+        <button>Sign in</button>
+      </div>
+    </form>
+  </div>
+
+<script  src="static/js/script.js"></script>
+
+</body>
+</html>
