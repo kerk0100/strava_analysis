@@ -5,6 +5,7 @@ import json
 import operator
 import csv
 import sys
+import pickle
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 csv.field_size_limit(sys.maxsize)
@@ -37,6 +38,8 @@ def load():
         param = {'per_page': 200, 'page': i}
         activity_data.append(requests.get(activites_url, headers=header, params=param).json())
         i = i + 1
+    with open('static/data/data.txt', 'wb') as f:
+        pickle.dump(activity_data, f)
 
     return activity_data
 
