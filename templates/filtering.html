@@ -109,36 +109,24 @@
       <br>
 
       <div class="container">
-
-        <form action="{{ url_for('filtering')}}" method="post">
-   
-          <div class="select-box">
-            
-            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose activity</span> </label>
-            <select id="selectType" name="selectType">
-              
-              <option>--</option>
-              <option>Run</option>
-              <option>Ride</option>
-              <option>Swim</option>
-            </select>
-  
-            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose operand</span> </label>
-            <select id="selectOp" name="selectOp">
-              <option>--</option>
-              <option>&gt</option>
-              <option>=</option>
-              <option>&lt</option>
-            </select>
-  
-            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose pace (min/km)</span> </label>
-            <input type="text" id="dist" name="dist"><br>
-  
-            <input type="submit" value="Submit" class="btn btn-primary float-right" style="margin: -40px 280px 0px 0" background-color="#FC6100">
-            
-          </div>
-  
-        </form>
+          <!-- {% for table in tables %}
+              {{ table|safe }}
+          {% endfor %} -->
+        <table>
+            <tr>
+                {% for col in column_names %}
+                <th>{{col}}</th>
+                {% endfor %}
+            </tr>
+            {% for row in row_data %}
+            <tr>
+                {% for col, row_ in zip(column_names, row) %}
+                <td>{{row_}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        
+        </table>
       </div>
 
     </section>

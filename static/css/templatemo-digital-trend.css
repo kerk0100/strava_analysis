@@ -189,6 +189,10 @@
       border-radius: 0
   }
 
+
+
+
+
   /*---------------------------------------
      GENERAL               
   -----------------------------------------*/
@@ -464,18 +468,35 @@
 
 
   /*---------------------------------------
-      ABOUT            
+      TABLE            
   -----------------------------------------*/
 
-  /* .about {
-    position: relative;
-    overflow: hidden;
+  table {
+    font-family: var(--base-font-family);
+    border-collapse: collapse;
+    width: 100%;
   }
 
-  .about-image img {
-    display: block;
-    margin: 0 auto;
-  } */
+  th {
+      border: 1px solid var(--primary-color);
+      text-align: left;
+      background: var(--primary-color);
+      padding: 8px;
+      color: var(--white-color);
+      font-weight: bold;
+      text-transform: uppercase;
+  }
+
+  td {
+    border: 1px solid var(--primary-color);
+    text-align: left;
+    background: var(--white-color);
+    padding: 8px;
+  }
+
+  tr:nth-child(even) {
+      background-color: #dddddd;
+  }
 
 
 
