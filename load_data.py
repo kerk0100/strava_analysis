@@ -43,6 +43,7 @@ def load(id,secret,refresh):
         i = i + 1
     with open('static/data/data.txt', 'wb') as f:
         pickle.dump(activity_data, f)
+    print(activity_data)
 
     return activity_data
 
@@ -81,3 +82,10 @@ def distance(dist, type, operand, activity_data):
                     activities.append(result)
     # return activities
     return df
+
+# uncomment to run output in terminal --> with command: python load_data.py
+# client_id =  "75915"
+# client_secret = "b4643a48bc4f66df4dab4a90d700f2b880dca4bf"
+# refresh_token = "e31b4e175850de6dce0393d64fd7c0e2023b6f54"
+
+# load(client_id, client_secret, refresh_token)
