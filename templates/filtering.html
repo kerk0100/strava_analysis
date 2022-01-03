@@ -17,13 +17,13 @@
       <link rel="stylesheet" href="static/css/owl.carousel.min.css">
       <link rel="stylesheet" href="static/css/owl.theme.default.min.css">
 
-      <!-- MAIN CSS -->
-      <link rel="stylesheet" href="static/css/templatemo-digital-trend.css">
+      <!-- Main CSS -->
+      <link rel="stylesheet" href="static/css/main.css">
 
 </head>
 <body>
 
-      <!-- MENU BAR -->
+      <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg position-relative">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index')}}">
@@ -81,11 +81,12 @@
           
           <label for="select-box1" class="label select-box1"><span class="label-desc">Choose activity</span> </label>
           <select id="selectType" name="selectType">
-            
             <option>--</option>
             <option>Run</option>
             <option>Ride</option>
             <option>Swim</option>
+            <option>Hike</option>
+            <option>NordicSki</option>
           </select>
 
           <label for="select-box1" class="label select-box1"><span class="label-desc">Choose operand</span> </label>
@@ -96,10 +97,30 @@
             <option>&lt</option>
           </select>
 
-          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance (km)</span> </label>
+          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance (m)</span> </label>
           <input type="text" id="dist" name="dist"><br>
 
-          <input type="submit" value="Submit" class="btn btn-primary float-right" style="margin: -40px 280px 0px 0" background-color=#FC6100>
+          <br>
+          <!-- https://stackoverflow.com/questions/44279398/customize-bootstrap-checkboxes -->
+          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose the metrics to view:</span> </label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" for="inlineCheckbox1">name</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+            <label class="form-check-label" for="inlineCheckbox2">distance</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
+            <label class="form-check-label" for="inlineCheckbox3">average_speed</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox4" value="option4">
+            <label class="form-check-label" for="inlineCheckbox4">moving_time</label>
+          </div>
+
+          <input type="submit" value="Submit" class="btn btn-primary" background-color=#FC6100>
           
         </div>
 
@@ -109,9 +130,6 @@
       <br>
 
       <div class="container">
-          <!-- {% for table in tables %}
-              {{ table|safe }}
-          {% endfor %} -->
         <table>
             <tr>
                 {% for col in column_names %}
