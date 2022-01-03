@@ -28,11 +28,12 @@ def filtering():
            dist = int(request.form.get("dist"))
        except:
            dist = 0
-            
+  
+       metrics = request.form.getlist('metric')
        with open('static/data/data.txt', 'rb') as f:
             activities = pickle.load(f)
        activity_data = activities
-       results = distance(int(dist), str(a_type), str(operand), activity_data)
+       results = distance(int(dist), str(a_type), str(operand), activity_data, metrics)
        activities_filtered = []
        for a in results:
            activities_filtered.append(a)
