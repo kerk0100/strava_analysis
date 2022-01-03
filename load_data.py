@@ -3,7 +3,11 @@ import requests
 import urllib3
 import json
 import operator
+import csv
+import sys
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+csv.field_size_limit(sys.maxsize)
 
 # loads activities from strava
 def load():
@@ -48,6 +52,10 @@ def distance(dist, type, operand, activity_data):
     op_func = ops[operand]
     for page in activity_data:
         for i in page:
+            # TODO: round the "equals" operand to nearest km
+            # TODO: let user choose what metrics they want to see
+            # TODO: option to save output to csv for further analysis
+            # TODO: 3 years in sport, compare years
             # filters through types, or processes all if user didn't select a type
             if i["type"]== type or type == "--":
                 if op_func(i["distance"], dist) or operand == "--":
