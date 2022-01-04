@@ -24,6 +24,12 @@ def filtering():
            a_type = "--"
        try:
            operand = request.form.get("selectOp")
+           if operand == "greater":
+               operand = ">"
+           elif operand == "less":
+               operand = "<"
+           else:
+               operand = "="
        except:
            operand = "--"
        try:

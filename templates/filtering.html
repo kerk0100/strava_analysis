@@ -80,7 +80,7 @@
         <div class="select-box">
           
           <label for="select-box1" class="label select-box1"><span class="label-desc">Choose activity</span> </label>
-          <select id="selectType" name="selectType">
+          <select id="selectType" name="selectType" onchange="yesnoCheck();">
             <option>--</option>
             <option>Run</option>
             <option>Ride</option>
@@ -90,16 +90,54 @@
           </select>
 
           <label for="select-box1" class="label select-box1"><span class="label-desc">Choose operand</span> </label>
-          <select id="selectOp" name="selectOp">
+          <select id="selectOp" name="selectOp" onchange="yesnoCheck();">
             <option>--</option>
-            <option>&gt</option>
-            <option>=</option>
-            <option>&lt</option>
+            <option value="greater">&gt</option>
+            <option value="equal">=</option>
+            <option value="less">&lt</option>
           </select>
 
-          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance (m)</span> </label>
-          <input type="text" id="dist" name="dist"><br>
+          <script>
+          function yesnoCheck() {
+            var swimType = document.getElementById("selectType").value;
+            var opType = document.getElementById("selectOp").value;
+            if (opType == "greater" | opType == "equal" | opType == "less") {
+              if (swimType == "Swim") {
+                document.getElementById("ifSwim").style.display = "block";
+                document.getElementById("ifNotSwim").style.display = "none";
+              } else {
+                document.getElementById("ifNotSwim").style.display = "block";
+                document.getElementById("ifSwim").style.display = "none";
+              }
+                
+            } else {
+                document.getElementById("ifSwim").style.display = "none";
+                document.getElementById("ifNotSwim").style.display = "none";
+            }
+          }
+          </script>
 
+          <div id="ifSwim" style="display: none;">
+            <br>
+            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance </span> </label>
+            <input type="text" id="dist" name="dist" placeholder="Enter in meters">
+          </div>
+
+          <div id="ifNotSwim" style="display: none;">
+            <br>
+            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance </span> </label>
+            <input type="text" id="dist" name="dist" placeholder="Enter in km">
+          </div>
+
+          <br>
+          <br>
+
+          <label for="start">Start date:</label>
+          <input type="date" id="start" name="trip-start" value="2018-07-22" min="2016-01-01" max="2022-12-31">
+          <label for="start">End date:</label>
+          <input type="date" id="start" name="trip-start" value="2018-07-22" min="2016-01-01" max="2022-12-31">
+
+          <br>
           <br>
 
           <!-- https://stackoverflow.com/questions/44279398/customize-bootstrap-checkboxes -->
@@ -148,7 +186,8 @@
             <tr>
                 {% for col, row_ in zip(column_names, row) %}
                   {% if loop.index == 1 %}
-                    <td><a href="https://www.strava.com/activities/{{ row_ }}">{{ row_ }}</a></td>
+                    <!-- turns id into link to strava activity -->
+                    <td><a href="https://www.strava.com/activities/{{ row_ }}" class="activities" target="_blank">{{ row_ }}</a></td>
                   {% else %}
                     <td>{{row_}}</td>
                   {% endif %}
@@ -158,7 +197,6 @@
         
         </table>
       </div>
-
     </section>
          
 
@@ -198,8 +236,6 @@
  <script src="static/js/aos.js"></script>
  <script src="static/js/owl.carousel.min.js"></script>
  <script src="static/js/custom.js"></script>
- <script src="static/js/script.js"></script>
- <script type="module" src="static/js/load.js"></script>
 
 </body>
 </html>

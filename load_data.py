@@ -43,6 +43,10 @@ def load(id,secret,refresh):
         pickle.dump(activity_data, f)
     return activity_data
 
+def format_date(date):
+    temp = date.split('T')
+    return temp[0]
+
 # filters activities by distance specified by user
 def distance(dist, type, operand, activity_data, metrics):
     column_names = metrics
@@ -87,8 +91,12 @@ def distance(dist, type, operand, activity_data, metrics):
                                     avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
                             else:
                                 avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
-                            metric_list.append(avg_speed)      
+                            metric_list.append(avg_speed)  
+                        elif m == 'start_date_local':
+                            date = format_date(i[m])
+                            metric_list.append(date) 
                         else:
                             metric_list.append(i[m])
                     df.loc[df.shape[0]] = metric_list
+    df = df.rename({'start_date_local': 'Date'}, axis=1)
     return df
