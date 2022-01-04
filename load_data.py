@@ -62,10 +62,11 @@ def distance(dist, type, operand, activity_data, metrics):
         op_func = ops[operand]
     for page in activity_data:
         for i in page:
-            # TODO: let user choose what metrics they want to see
             # TODO: option to save output to csv for further analysis
             # TODO: 3 years in sport, compare years
-            # filters through types, or processes all if user didn't select a type
+            # TODO: Let user put in a date range
+            # TODO: create a loading sign on login page for loading data, please wait
+            # TODO: fix when user doesn't select any metrics -- alert message
             if i["type"]== type or type == "--":
                 # rounding so that output is to the nearest .1 km for equals operand
                 if operand == "=":
@@ -88,10 +89,8 @@ def distance(dist, type, operand, activity_data, metrics):
                         elif m == 'average_speed':
                             if i["type"] == "Run":
                                 avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
-                            elif i["type"] == "Ride":
-                                avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
                             else:
-                                avg_speed = i["average_speed"]
+                                avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
                             metric_list.append(avg_speed)
                             
                         else:
