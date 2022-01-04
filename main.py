@@ -37,7 +37,6 @@ def filtering():
        activities_filtered = []
        for a in results:
            activities_filtered.append(a)
-       header = ["Name", "Distance"] 
        return render_template("filtering.html", column_names=results.columns.values, row_data=list(results.values.tolist()), zip=zip)
     return render_template("filtering.html")
 
