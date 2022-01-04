@@ -101,6 +101,7 @@
           <input type="text" id="dist" name="dist"><br>
 
           <br>
+
           <!-- https://stackoverflow.com/questions/44279398/customize-bootstrap-checkboxes -->
           <label for="select-box1" class="label select-box1"><span class="label-desc">Choose the metrics to view:</span> </label>
           <div class="custom custom-control custom-checkbox">
@@ -112,7 +113,7 @@
             <label class="custom-control-label" for="inlineCheckbox2">Distance</label>
           </div>
           <div class="custom custom-control custom-checkbox">
-            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox3" value="average_speed" style="color:#FC6100;">
+            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox3" value="average_speed">
             <label class="custom-control-label" for="inlineCheckbox3">Average Speed</label>
           </div>
           <div class="custom custom-control custom-checkbox">
@@ -126,9 +127,10 @@
 
           <br>
 
-          <input type="submit" value="Submit" class="btn btn-primary" background-color=#FC6100>
+          <input type="submit" value="Submit" class="btn btn-primary" id="checkBtn" background-color=#FC6100>
           
         </div>
+
 
       </form>
       </div>
@@ -145,7 +147,11 @@
             {% for row in row_data %}
             <tr>
                 {% for col, row_ in zip(column_names, row) %}
-                <td>{{row_}}</td>
+                  {% if loop.index == 1 %}
+                    <td><a href="https://www.strava.com/activities/{{ row_ }}">{{ row_ }}</a></td>
+                  {% else %}
+                    <td>{{row_}}</td>
+                  {% endif %}
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -192,6 +198,7 @@
  <script src="static/js/aos.js"></script>
  <script src="static/js/owl.carousel.min.js"></script>
  <script src="static/js/custom.js"></script>
+ <script src="static/js/script.js"></script>
  <script type="module" src="static/js/load.js"></script>
 
 </body>

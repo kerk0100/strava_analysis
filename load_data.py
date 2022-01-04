@@ -7,6 +7,7 @@ import csv
 import sys
 import pickle
 import pandas as pd
+import streamlit as st
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 csv.field_size_limit(sys.maxsize)
@@ -16,9 +17,6 @@ def load(id,secret,refresh):
 
     auth_url = "https://www.strava.com/oauth/token"
     activites_url = "https://www.strava.com/api/v3/athlete/activities"
-    # 'client_id': "75915",
-    # 'client_secret': 'b4643a48bc4f66df4dab4a90d700f2b880dca4bf',
-    # 'refresh_token': 'e31b4e175850de6dce0393d64fd7c0e2023b6f54',
     payload = {
         'client_id': str(id),
         'client_secret': str(secret),
@@ -43,13 +41,10 @@ def load(id,secret,refresh):
         i = i + 1
     with open('static/data/data.txt', 'wb') as f:
         pickle.dump(activity_data, f)
-    print(activity_data)
-
     return activity_data
 
 # filters activities by distance specified by user
 def distance(dist, type, operand, activity_data, metrics):
-    # activities = []
     column_names = metrics
     df = pd.DataFrame(columns = column_names)
     
@@ -88,19 +83,12 @@ def distance(dist, type, operand, activity_data, metrics):
                             metric_list.append(time)
                         elif m == 'average_speed':
                             if i["type"] == "Run":
-                                avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
+                                if i["distance"] != 0:
+                                    avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
                             else:
                                 avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
-                            metric_list.append(avg_speed)
-                            
+                            metric_list.append(avg_speed)      
                         else:
                             metric_list.append(i[m])
                     df.loc[df.shape[0]] = metric_list
     return df
-
-# uncomment to run output in terminal --> with command: python load_data.py
-# client_id =  "75915"
-# client_secret = "b4643a48bc4f66df4dab4a90d700f2b880dca4bf"
-# refresh_token = "e31b4e175850de6dce0393d64fd7c0e2023b6f54"
-
-# load(client_id, client_secret, refresh_token)

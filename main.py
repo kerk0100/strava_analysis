@@ -16,6 +16,8 @@ def index():
 def filtering():
     if request.method == "POST":
        # getting input with name = selectType, etc.. in HTML form
+       metrics = request.form.getlist('metric')
+       metrics.insert(0, "id")
        try:
            a_type = request.form.get("selectType")
        except:
@@ -29,7 +31,6 @@ def filtering():
        except:
            dist = 0
   
-       metrics = request.form.getlist('metric')
        with open('static/data/data.txt', 'rb') as f:
             activities = pickle.load(f)
        activity_data = activities
