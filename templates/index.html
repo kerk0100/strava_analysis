@@ -42,6 +42,9 @@
                         <a href="{{ url_for('filtering')}}" class="nav-link">Filtering</a>
                     </li>
                     <li class="nav-item">
+                      <a href="{{ url_for('graph')}}" class="nav-link">Graphs</a>
+                  </li>
+                    <li class="nav-item">
                         <a href="{{ url_for('join')}}" class="nav-link">Join</a>
                     </li>
                 </ul>
@@ -59,6 +62,7 @@
                                    <h1 class="text-white" data-aos="fade-up">A deeper dive into activity data.</h1>
 
                                    <a href="{{ url_for('filtering')}}" class="custom-btn btn-bg btn mt-3" data-aos="fade-up" data-aos-delay="100">Filtering</a>
+                                   <a href="{{ url_for('graph')}}" class="custom-btn btn-bg btn mt-3" data-aos="fade-up" data-aos-delay="100">Graphs</a>
                                    <a href="{{ url_for('join')}}" class="custom-btn btn-bg btn mt-3" data-aos="fade-up" data-aos-delay="100">Join</a>
                               </div>
                         </div>
