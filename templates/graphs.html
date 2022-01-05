@@ -60,7 +60,7 @@
                <div class="col-lg-6 col-md-10 col-12 d-flex flex-column justify-content-center align-items-center">
                      <div class="hero-text">
 
-                          <h1 class="text-white" data-aos="fade-up">Filter through your activities by selecting criteria below.</h1>
+                          <h1 class="text-white" data-aos="fade-up">Visualize your activities by selecting a timeframe below.</h1>
                      </div>
                </div>
 
@@ -78,92 +78,30 @@
     <section class="blog section-padding">
       <div class="container">
 
-      <form action="{{ url_for('filtering')}}" method="post">
+      <form action="{{ url_for('graph')}}" method="post">
  
         <div class="select-box">
-          
-          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose activity</span> </label>
-          <select id="selectType" name="selectType" onchange="yesnoCheck();">
-            <option>--</option>
-            <option>Run</option>
-            <option>Ride</option>
-            <option>Swim</option>
-            <option>Hike</option>
-            <option>NordicSki</option>
-          </select>
-
-          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose operand</span> </label>
-          <select id="selectOp" name="selectOp" onchange="yesnoCheck();">
-            <option value="nothing">--</option>
-            <option value="greater">&gt</option>
-            <option value="equal">=</option>
-            <option value="less">&lt</option>
-          </select>
-
-          <script>
-          function yesnoCheck() {
-            var swimType = document.getElementById("selectType").value;
-            var opType = document.getElementById("selectOp").value;
-            if (opType == "greater" | opType == "equal" | opType == "less") {
-              if (swimType == "Swim") {
-                document.getElementById("ifSwim").style.display = "block";
-                document.getElementById("ifNotSwim").style.display = "none";
-              } else {
-                document.getElementById("ifNotSwim").style.display = "block";
-                document.getElementById("ifSwim").style.display = "none";
-              }
-                
-            } else {
-                document.getElementById("ifSwim").style.display = "none";
-                document.getElementById("ifNotSwim").style.display = "none";
-            }
-          }
-          </script>
-
-          <div id="ifSwim" style="display: none;">
-            <br>
-            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance </span> </label>
-            <input type="text" id="swim_dist" name="swim_dist" placeholder="Enter in meters">
-          </div>
-
-          <div id="ifNotSwim" style="display: none;">
-            <br>
-            <label for="select-box1" class="label select-box1"><span class="label-desc">Choose distance </span> </label>
-            <input type="text" id="other_dist" name="other_dist" placeholder="Enter in km">
-          </div>
-
-          <br>
-          <br>
-
-          <label for="start">Start date:</label>
-          <input type="date" id="start" name="trip-start" value="0" min="2016-01-01" max="2022-12-31">
-          <label for="start">End date:</label>
-          <input type="date" id="end" name="trip-end" value="0" min="2016-01-01" max="2022-12-31">
-
-          <br>
-          <br>
-
           <!-- https://stackoverflow.com/questions/44279398/customize-bootstrap-checkboxes -->
-          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose the metrics to view:</span> </label>
+          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose years to visualize:</span> </label>
           <div class="custom custom-control custom-checkbox">
             <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox1" value="name">
-            <label class="custom-control-label" for="inlineCheckbox1">Name</label>
+            <label class="custom-control-label" for="inlineCheckbox1">2018</label>
           </div>
           <div class="custom custom-control custom-checkbox">
             <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox2" value="distance">
-            <label class="custom-control-label" for="inlineCheckbox2">Distance</label>
+            <label class="custom-control-label" for="inlineCheckbox2">2019</label>
           </div>
           <div class="custom custom-control custom-checkbox">
             <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox3" value="average_speed">
-            <label class="custom-control-label" for="inlineCheckbox3">Average Speed</label>
+            <label class="custom-control-label" for="inlineCheckbox3">2020</label>
           </div>
           <div class="custom custom-control custom-checkbox">
             <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox4" value="moving_time">
-            <label class="custom-control-label" for="inlineCheckbox4">Moving Time</label>
+            <label class="custom-control-label" for="inlineCheckbox4">2021</label>
           </div>
           <div class="custom custom-control custom-checkbox">
             <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox5" value="start_date_local">
-            <label class="custom-control-label" for="inlineCheckbox5">Date</label>
+            <label class="custom-control-label" for="inlineCheckbox5">2022</label>
           </div>
 
           <br>

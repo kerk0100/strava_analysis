@@ -9,7 +9,20 @@
 </head>
 
 <body>
-  <div class="login-form">
+
+  <div class="login-form" id="loading" style="display: none;">
+    <form>
+      <div class="content">
+        <img src="static/images/bike.gif" class="bike_load" alt="circle" width="230" height="250" transform=rotate(20deg)>
+      </div>
+      <div class="action">
+        <button disabled>Loading your activities...</button>
+      </div>
+    </form>
+  </div>
+
+
+  <div class="login-form" id="content" style="display: block;">
     <form action="{{ url_for('login')}}" method="post">
       <h1>Enter Strava Credentials</h1>
       <div class="content">
@@ -24,12 +37,17 @@
         </div>
       </div>
       <div class="action">
-        <button>Sign in</button>
+        <button onclick="loading();">Sign in</button>
       </div>
     </form>
   </div>
 
-<script  src="static/js/script.js"></script>
+<script type="text/javascript">
+  function loading(){
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("content").style.display = "none";     
+  }
+</script>
 
 </body>
 </html>
