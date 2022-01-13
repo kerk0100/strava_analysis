@@ -4,6 +4,8 @@
 
       <title>Strava Analysis Filtering</title>
 
+      <link rel="shortcut icon" href="static/images/circle.ico">
+
       <meta charset="UTF-8">
       <meta http-equiv="X-UA-Compatible" content="IE=Edge">
       <meta name="description" content="">
@@ -84,24 +86,24 @@
           <!-- https://stackoverflow.com/questions/44279398/customize-bootstrap-checkboxes -->
           <label for="select-box1" class="label select-box1"><span class="label-desc">Choose years to visualize:</span> </label>
           <div class="custom custom-control custom-checkbox">
-            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox1" value="name">
-            <label class="custom-control-label" for="inlineCheckbox1">2018</label>
+            <input class="custom-control-input" name="year" type="checkbox" id="inlineCheckbox6" value="2018">
+            <label class="custom-control-label" for="inlineCheckbox6">2018</label>
           </div>
           <div class="custom custom-control custom-checkbox">
-            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox2" value="distance">
-            <label class="custom-control-label" for="inlineCheckbox2">2019</label>
+            <input class="custom-control-input" name="year" type="checkbox" id="inlineCheckbox7" value="2019">
+            <label class="custom-control-label" for="inlineCheckbox7">2019</label>
           </div>
           <div class="custom custom-control custom-checkbox">
-            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox3" value="average_speed">
-            <label class="custom-control-label" for="inlineCheckbox3">2020</label>
+            <input class="custom-control-input" name="year" type="checkbox" id="inlineCheckbox8" value="2020">
+            <label class="custom-control-label" for="inlineCheckbox8">2020</label>
           </div>
           <div class="custom custom-control custom-checkbox">
-            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox4" value="moving_time">
-            <label class="custom-control-label" for="inlineCheckbox4">2021</label>
+            <input class="custom-control-input" name="year" type="checkbox" id="inlineCheckbox9" value="2021">
+            <label class="custom-control-label" for="inlineCheckbox9">2021</label>
           </div>
           <div class="custom custom-control custom-checkbox">
-            <input class="custom-control-input" name="metric" type="checkbox" id="inlineCheckbox5" value="start_date_local">
-            <label class="custom-control-label" for="inlineCheckbox5">2022</label>
+            <input class="custom-control-input" name="year" type="checkbox" id="inlineCheckbox10" value="2022">
+            <label class="custom-control-label" for="inlineCheckbox10">2022</label>
           </div>
 
           <br>
@@ -113,34 +115,14 @@
 
       </form>
       </div>
-
-      <br>
-
-      <div class="container">
-        <table>
-            <tr>
-                {% for col in column_names %}
-                <th>{{col}}</th>
-                {% endfor %}
-            </tr>
-            {% for row in row_data %}
-            <tr>
-                {% for col, row_ in zip(column_names, row) %}
-                  {% if loop.index == 1 %}
-                    <!-- turns id into link to strava activity -->
-                    <td><a href="https://www.strava.com/activities/{{ row_ }}" class="activities" target="_blank">{{ row_ }}</a></td>
-                  {% else %}
-                    <td>{{row_}}</td>
-                  {% endif %}
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        
-        </table>
+      <div>
+        {{ plot }}
       </div>
     </section>
-         
 
+
+         
+<!-- Footer -->
  <footer class="site-footer">
   <div class="container">
     <div class="row">

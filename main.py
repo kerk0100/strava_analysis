@@ -4,20 +4,30 @@ import csv
 import sys
 import pickle
 import time
+import json
+import plotly
+from flask import Markup
+# use for displaying graphs in webpage
+# from dash import Dash
+# import dash_core_components as dcc
+# import dash_html_components as html
 
 csv.field_size_limit(sys.maxsize)
 
 app = Flask(__name__)
 
+# TODO: "/" route should be login, and not index
 @app.route("/")
 def index():
     return render_template("index.html")
-    
+
+# execute when user on filtering page
 @app.route("/filtering", methods =["GET", "POST"])
 def filtering():
     if request.method == "POST":
        # getting input with name = selectType, etc.. in HTML form
        metrics = request.form.getlist('metric')
+       # include id in all the queries (id includes link to activity)
        metrics.insert(0, "id")
        try:
            a_type = request.form.get("selectType")
@@ -68,9 +78,14 @@ def join():
 @app.route("/graphs", methods=['GET', 'POST'])
 def graph():
     if request.method == "POST":
-        years = ["2021", "2020", "2019"]
-        graph_data(years)
-        return render_template("graphs.html")
+        years = []
+        temp = request.form.getlist('year')
+        for y in temp:
+            years.insert(0,y)
+        graph = graph_data(years)
+        # graphJSON = json.dumps(graph, cls=plotly.utils.PlotlyJSONEncoder)
+        return render_template('graphs.html', plot= Markup(graph))
+        # return render_template("graphs.html", graphJSON=graphJSON)
     return render_template("graphs.html")
 
 @app.route("/login", methods =["GET", "POST"])
