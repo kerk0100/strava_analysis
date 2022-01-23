@@ -46,7 +46,7 @@
                     <a href="{{ url_for('graph')}}" class="nav-link">Graphs</a>
                 </li>
                   <li class="nav-item">
-                      <a href="{{ url_for('join')}}" class="nav-link">Join</a>
+                      <a href="{{ url_for('merge')}}" class="nav-link">Merge</a>
                   </li>
               </ul>
             </div>
@@ -106,6 +106,15 @@
             <label class="custom-control-label" for="inlineCheckbox10">2022</label>
           </div>
 
+          <label for="select-box1" class="label select-box1"><span class="label-desc">Choose activity</span> </label>
+          <select id="selectActivity" name="selectActivity">
+            <option>All</option>
+            <option>Run</option>
+            <option>Ride</option>
+            <option>Hike</option>
+            <option>NordicSki</option>
+          </select>
+
           <br>
 
           <input type="submit" value="Submit" class="btn btn-primary" id="checkBtn" background-color=#FC6100>
@@ -117,6 +126,14 @@
       </div>
       <div>
         {{ plot }}
+      </div>
+      <div class="setup">
+        <div class="half-page1">
+          {{ bar_plot }}
+        </div>
+        <div class="half-page2">
+          {{ hr_plot }}
+        </div>
       </div>
     </section>
 
