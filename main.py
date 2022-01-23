@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, jsonify, redirect, make_response
-from load_data import graph_data, load, distance
+from load_data import graph_data, load, distance, find_activity
 import csv
 import sys
 import pickle
@@ -71,9 +71,17 @@ def filtering():
        return render_template("filtering.html", column_names=results.columns.values, row_data=list(results.values.tolist()), zip=zip)
     return render_template("filtering.html")
 
-@app.route("/join")
-def join():
-    return render_template("join.html")
+@app.route("/merge", methods =["GET", "POST"])
+def merge():
+    if request.method == "POST":
+        id_1 = request.form.get("act_id1")
+        id_2 = request.form.get("act_id2")
+        with open('static/data/data.txt', 'rb') as f:
+            activities = pickle.load(f)
+        activity_data = activities
+        result = find_activity(id_1, id_2, activity_data)
+        return render_template("merge.html", variable = result)
+    return render_template("merge.html")
 
 @app.route("/graphs", methods=['GET', 'POST'])
 def graph():
@@ -82,10 +90,9 @@ def graph():
         temp = request.form.getlist('year')
         for y in temp:
             years.insert(0,y)
-        graph = graph_data(years)
-        # graphJSON = json.dumps(graph, cls=plotly.utils.PlotlyJSONEncoder)
-        return render_template('graphs.html', plot= Markup(graph))
-        # return render_template("graphs.html", graphJSON=graphJSON)
+        a_type = request.form.get("selectActivity")
+        graph, bar_graph, hr_graph = graph_data(years, a_type)
+        return render_template('graphs.html', plot= Markup(graph), bar_plot=Markup(bar_graph), hr_plot=Markup(hr_graph))
     return render_template("graphs.html")
 
 @app.route("/login", methods =["GET", "POST"])
