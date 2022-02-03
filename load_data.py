@@ -16,6 +16,8 @@ import plotly.io as pio
 from plotly.offline import plot
 # from plotly.graph_objs import Scatter
 from pathlib import Path
+import polyline
+import folium
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -288,18 +290,92 @@ def speed_units(df_line, a_type):
 def find_activity(id_1, id_2, activity_data):
     activity_1 = 0
     activity_2 = 0
+    id_1 = str(id_1)
+    id_2 = str(id_2)
     for page in activity_data:
         # iterate through each activity on page 
         for i in page:
             # checks to see if the type of activity matches the user's filter input
-            if i["id"]== id_1:
+            if str(i["id"])== id_1:
                 activity_1 = i
-            if i["id"] == id_2:
+            if str(i["id"]) == id_2:
                 activity_2 = i
     if activity_1 != 0 and activity_2 != 0:
-        if activity_1["end_latlng"] == activity_2["end_latlng"]:
-            result = "Correct"
-            return result
+        # figure out what to do with activity ID, add in condition if end time and start time are 10 min apart
+        # TODO: check if its a ride or a run, then add metrics accordingly
+        if (abs(activity_1["end_latlng"][0] - activity_2["start_latlng"][0]) < 10) and \
+                (abs(activity_1["end_latlng"][1] - activity_2["start_latlng"][1]) < 10) and \
+                    (activity_1["type"] == activity_2["type"]):
+            coef_time_1 = activity_1['elapsed_time']/ (activity_1['elapsed_time'] + activity_2['elapsed_time'])
+            coef_time_2 = activity_2['elapsed_time']/ (activity_1['elapsed_time'] + activity_2['elapsed_time'])
+
+            print(coef_time_1)
+            print(coef_time_2)
+            activity_1['name'] = activity_1["name"] + " + " + activity_2["name"]
+            activity_1['athlete_count'] = max(activity_1['athlete_count'], activity_2['athlete_count'])
+            metrics = ['distance', 'moving_time', 'elapsed_time', 'total_elevation_gain', 'achievement_count', 'kudos_count', 'comment_count','photo_count', 'pr_count', 'total_photo_count']
+            for m in metrics:
+                activity_1[m] += activity_2[m]
+
+            avg_metrics = ['average_speed', 'max_speed', 'average_heartrate', 'average_cadence', 'suffer_score']
+            for am in avg_metrics:
+                try:
+                    if am == 'average_heartrate':
+                        if activity_1['has_heartrate'] == False and activity_2['has_heartrate'] == False :
+                            continue
+                        if activity_1['has_heartrate'] == False:
+                            activity_1['has_heartrate'] = activity_2['has_heartrate']
+                        if activity_2['has_heartrate'] == False:
+                            activity_1['has_heartrate'] = activity_1['has_heartrate']
+                        else:
+                            activity_1[am] = coef_time_1*activity_1[am] + coef_time_2*activity_2[am]
+                        activity_1['max_heartrate'] = max(activity_1['max_heartrate'], activity_2['max_heartrate'])
+                    else:
+                        activity_1[am] = coef_time_1*activity_1[am] + coef_time_2*activity_2[am]
+                except:
+                    continue
+            if activity_1['elev_high']:
+                activity_1['elev_high'] = max(activity_1['elev_high'], activity_2['elev_high'])
+            if activity_1['elev_low']:
+                activity_1['elev_low'] = min(activity_1['elev_low'], activity_2['elev_low'])
+            
+            map_1 = activity_1['map']['summary_polyline']
+            map_2 = activity_2['map']['summary_polyline']
+            poly_decode_1 = polyline.decode(map_1)
+            poly_decode_2 = polyline.decode(map_2)
+            poly_decode = poly_decode_1 + poly_decode_2
+            poly_encode = polyline.encode(poly_decode)
+            activity_1['map']['summary_polyline'] = poly_encode
+            sum_lat = 0
+            sum_lon = 0
+            max_lon = 0
+            min_lon = 100000
+            count = 0
+            for l in poly_decode:
+                count += 1
+                if l[0] > max_lon:
+                    max_lon = l[0]
+                if l[0] < min_lon:
+                    min_lon = l[0]
+                sum_lat += l[0]
+                sum_lon += l[1]
+            avg_lat = sum_lat/count
+            avg_lon = sum_lon/count
+            m = folium.Map(location=[avg_lat, avg_lon], zoom_start=11)
+
+            loc = poly_decode
+
+            folium.PolyLine(loc,
+                            color= '#FC6100',
+                            weight=5,
+                            opacity=1).add_to(m)
+            folium.TileLayer('Stamen Terrain').add_to(m)
+
+            act_list = [activity_1['name'], 'Distance: ' + str(activity_1['distance']/1000) + ' km', 'Elev. gain: ' + str(activity_1['total_elevation_gain']) + ' m', 'Avg HR: ' + str(round(activity_1['average_heartrate'],2)) + ' bpm']
+
+            #{'id': 6468508817, 'upload_id': 6877595631, 'upload_id_str': '6877595631', 'external_id': '61d37417b30fe6795f7ad43e.fit'}
+            #{'id': 6468509184, 'upload_id': 6877596021, 'upload_id_str': '6877596021', 'external_id': '61d3741dff187d526c7a936d.fit'}
+            return m, act_list
         else:
             result = "Not Correct"
             return result
@@ -322,3 +398,4 @@ def find_activity(id_1, id_2, activity_data):
     # TODO: find new gif for loading page, and fix formatting to maintain size of login form
     # TODO: change join to merge instead (better wording)
     # TODO: Avg pace per time of day --> graph
+    # TODO: map of world with photos taken at each location for the activities

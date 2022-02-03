@@ -1,13 +1,23 @@
 id,name,type,distance,month,year,total_elevation_gain,has_heartrate,average_heartrate,average_speed
-6570799711,Morning Ride,Ride,28.19,01,2022,228.4,True,117.0,6.148
+6617253907,Lunch Ride,Ride,44.903,02,2022,281.4,True,126.1,6.37
+6611776705,Roomie run,Run,6.291,01,2022,68.5,True,163.3,2.67
+6601911893,Garibaldi ,Hike,20.884,01,2022,998.2,True,120.2,1.086
+6596661234,Comeback baby! First 10k since July,Run,10.054,01,2022,211.4,True,169.0,2.687
+6587895738,Part ✌🏼 ,NordicSki,9.038,01,2022,182.9,True,172.7,3.554
+6587730829,Work hard play hard ,NordicSki,15.95,01,2022,328.2,True,140.8,3.829
+6581065440,Lunch Run,Run,4.879,01,2022,31.3,True,159.4,2.964
+6576959237,Knee update: not too shabby,Run,5.711,01,2022,65.2,True,164.3,3.228
+6574987764,A success story,Hike,7.19,01,2022,206.0,True,133.3,1.393
+6572147510,BEST HIKE EVER,Hike,5.135,01,2022,77.5,True,124.4,1.037
+6570799711,Wears sunglasses in the fog so she actually can't see,Ride,28.19,01,2022,228.4,True,117.0,6.148
 6564416797,Morning Ride,Ride,13.378,01,2022,107.0,True,116.3,6.064
-6560485229,Afternoon Ride,Ride,12.762,01,2022,138.8,True,128.9,5.785
+6560485229,BSP Safety Check for UBC Tri,Ride,12.762,01,2022,138.8,True,128.9,5.785
 6558955571,Hayley & I run,Run,8.475,01,2022,55.5,True,167.9,2.8
 6550578829,Pure freestyle,Swim,1.3,01,2022,0.0,False,0.0,0.794
 6545031408,Run without Sheetal 🥲,Run,4.328,01,2022,38.4,True,170.0,3.18
 6540442349,Run with Sheetal,Run,7.038,01,2022,75.3,True,164.0,2.897
 6536065417,Seymour,Hike,9.616,01,2022,635.3,True,125.3,0.992
-6529244816,Morning Run,Run,6.291,01,2022,69.6,True,172.0,3.011
+6529244816,Run with Christina,Run,6.291,01,2022,69.6,True,172.0,3.011
 6515046498,Back in chlorine,Swim,1.2,01,2022,0.0,False,0.0,0.86
 6509328716,Rain making the ice icy 🌧 ,Run,5.434,01,2022,41.2,True,171.0,2.611
 6507756960,Afternoon Run,Run,5.17,01,2022,86.9,True,161.6,2.731
@@ -29,7 +39,7 @@ id,name,type,distance,month,year,total_elevation_gain,has_heartrate,average_hear
 6439479973,Cuba Special 🌴,Run,3.402,12,2021,16.6,True,167.6,3.176
 6430696179,Afternoon Run,Run,2.834,12,2021,16.3,True,170.0,3.118
 6426981895,Afternoon Run,Run,3.003,12,2021,14.6,True,167.3,3.168
-6423426736,Morning Activity,NordicSki,9.592,12,2021,104.4,True,102.1,2.981
+6423426736,Another one with KK,NordicSki,9.592,12,2021,104.4,True,102.1,2.981
 6419914978,Ski with Kathryn,NordicSki,10.154,12,2021,122.5,True,133.5,2.82
 6419352250,Annual Christmas Jog,Run,2.87,12,2021,14.6,True,169.5,2.99
 6408215115,Lunch Run,Run,2.217,12,2021,35.0,True,162.2,2.976
@@ -51,7 +61,7 @@ id,name,type,distance,month,year,total_elevation_gain,has_heartrate,average_hear
 6301398088,Afternoon Ride,Ride,27.408,11,2021,276.5,True,108.3,6.133
 6290626148,Old news?,Ride,38.9037,11,2021,404.8,False,0.0,5.816
 6299178407,Morning Ride,Ride,3.435,11,2021,18.5,True,158.9,7.34
-6285489640,Morning Ride,Ride,23.099,11,2021,264.3,False,0.0,7.634
+6285489640,Skills lab UBC Cycling,Ride,23.099,11,2021,264.3,False,0.0,7.634
 6330134244,Morning Swim,Swim,1.1,11,2021,0.0,False,0.0,0.685
 6253956618,Mt. Brunswick!,Hike,16.492,11,2021,1436.4,True,128.1,1.019
 6244938734,Lunch Ride,Ride,27.958,11,2021,275.2,True,125.1,6.149
@@ -72,12 +82,12 @@ id,name,type,distance,month,year,total_elevation_gain,has_heartrate,average_hear
 6133902882,Afternoon Ride,Ride,31.354,10,2021,251.9,True,137.8,6.864
 6131529053,FTP Test,Ride,0.0,10,2021,0.0,True,135.4,0.0
 6127159432,Evening Swim,Swim,1.275,10,2021,0.0,False,0.0,0.763
-6131528467,Afternoon Run,Run,2.766,10,2021,22.8,True,171.9,3.183
+6131528467,Knee hurts so bad 🥲,Run,2.766,10,2021,22.8,True,171.9,3.183
 6114707895,Evening Run,Run,1.762,10,2021,20.6,True,100.5,2.874
 6114707741,Afternoon Run,Run,1.743,10,2021,18.1,True,145.0,3.129
 6104775983,Afternoon Run,Run,1.552,10,2021,28.8,True,165.9,3.055
 6104775469,Morning Ride,Ride,32.381,10,2021,456.1,True,128.6,5.733
-6097923331,Morning Ride,Ride,60.909,10,2021,650.0,True,126.4,6.368
+6097923331,Felt sick 🤒 ,Ride,60.909,10,2021,650.0,True,126.4,6.368
 6097904325,Afternoon Ride,Ride,32.438,10,2021,405.7,True,110.8,4.898
 6079467873,Afternoon Ride,Ride,31.324,10,2021,251.7,True,117.8,7.135
 6074815265,Picked up a capo for my NEW GUITAR!! 🥳,Run,1.81,10,2021,25.4,True,167.6,3.094
