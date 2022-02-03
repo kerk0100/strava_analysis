@@ -76,6 +76,8 @@
 
     <section class="blog section-padding">
       <div class="container">
+      
+      <p> Enter the IDs of the activities that you would like to merge: </p>
 
       <form action="{{ url_for('merge')}}" method="post">
  
@@ -102,12 +104,19 @@
 
       </form>
       </div>
+      <br>
+      <div style="width:800px; margin:0 auto;">
+        <iframe class="map", src="/map" width="500" height="400"></iframe>
+        <br>
+
+        {% for metric in result %}
+        <p>{{ metric }} </p>
+        {% endfor %}
+
+      </div>
 
       <br>
       <!-- displays table from user hits submit button above -->
-      <div>
-        {{ variable }}
-      </div>
     </section>
 
 <!-- Footer -->

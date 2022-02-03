@@ -7,6 +7,7 @@ import time
 import json
 import plotly
 from flask import Markup
+import folium
 # use for displaying graphs in webpage
 # from dash import Dash
 # import dash_core_components as dcc
@@ -79,9 +80,16 @@ def merge():
         with open('static/data/data.txt', 'rb') as f:
             activities = pickle.load(f)
         activity_data = activities
-        result = find_activity(id_1, id_2, activity_data)
-        return render_template("merge.html", variable = result)
+        folium_map, merged_data = find_activity(id_1, id_2, activity_data)
+        folium_map.save("templates/map.html")
+        # return render_template("merge.html", result = Markup("templates/map.html"))
+        # return folium_map._repr_html_()
+        return render_template("merge.html", result = merged_data)
     return render_template("merge.html")
+
+@app.route("/map")
+def map():
+    return render_template("map.html")
 
 @app.route("/graphs", methods=['GET', 'POST'])
 def graph():
