@@ -18,6 +18,7 @@ from plotly.offline import plot
 from pathlib import Path
 import polyline
 import folium
+import statsmodels
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -175,7 +176,7 @@ def get_data():
     # load activities from txt file
     with open('static/data/data.txt', 'rb') as f:
         activities = pickle.load(f)
-    column_names = ["id","name", "type", "distance", "month", "year", "total_elevation_gain", "has_heartrate", "average_heartrate", "average_speed"]
+    column_names = ["id","name", "type", "distance", "month", "year", "total_elevation_gain", "has_heartrate", "average_heartrate", "average_speed", "moving_time"]
     df = pd.DataFrame(columns = column_names)
 
     # iterate through each page of activities
@@ -265,7 +266,7 @@ def year_dist_graph(df_line, years, a_type):
 
 def hr_graph(df, years, a_type):
     pio.templates.default = "plotly_white"
-    df_t = df[["year", "type", "average_heartrate", "average_speed"]]
+    df_t = df[["year", "type", "average_heartrate", "average_speed", "moving_time", "distance"]]
     if a_type != "All":
         df_line = df_t[(df_t["type"] == a_type)]
         df_line = speed_units(df_line, a_type)
@@ -278,14 +279,27 @@ def hr_graph(df, years, a_type):
     outliers = df_line.average_heartrate.quantile(0.32)
     df_line = df_line[df_line.average_heartrate > outliers]
     title = a_type + ": Average Speed to Average HR"
+    # trendline="ols"
     fig = px.scatter(df_line, x="average_speed", y="average_heartrate", color="year", color_discrete_map= {'2018': 'black','2019': '#f7d0b5','2020': "#FC6100",'2021': '#243856','2022': '#909090'})
-    fig.update_layout(xaxis_title="Avg Speed", yaxis_title="Avg HR", title_text=title, title_x=0.5)
+    if a_type =='Run':
+        x_name = "Avg Speed: min/km"
+    else:
+        x_name = "Avg Speed: km/h"
+    fig.update_layout(xaxis_title=x_name, yaxis_title="Avg HR", title_text=title, title_x=0.5)
     return fig
 # TODO: fix! not accurately calculating pace... :(
 def speed_units(df_line, a_type):
     if a_type == 'Run':
-        df_line["average_speed"] = df_line["average_speed"].apply(lambda x: x * (50/3))
+        df_line["average_speed"] = df_line["average_speed"].apply(speed_func)
+    else:
+        df_line["average_speed"] = df_line["average_speed"].apply(lambda x: x * (3.6))
     return df_line
+
+def speed_func(x):
+    if x != 0:
+        return 1/x * (50/3)
+    else:
+        return 0
 
 def find_activity(id_1, id_2, activity_data):
     activity_1 = 0
@@ -301,10 +315,10 @@ def find_activity(id_1, id_2, activity_data):
             if str(i["id"]) == id_2:
                 activity_2 = i
     if activity_1 != 0 and activity_2 != 0:
-        # figure out what to do with activity ID, add in condition if end time and start time are 10 min apart
+        # figure out what to do with activity ID, add in condition if end time and start time are 10 min apart & 111m apart
         # TODO: check if its a ride or a run, then add metrics accordingly
-        if (abs(activity_1["end_latlng"][0] - activity_2["start_latlng"][0]) < 10) and \
-                (abs(activity_1["end_latlng"][1] - activity_2["start_latlng"][1]) < 10) and \
+        if (abs(activity_1["end_latlng"][0] - activity_2["start_latlng"][0]) < 0.001) and \
+                (abs(activity_1["end_latlng"][1] - activity_2["start_latlng"][1]) < 0.001) and \
                     (activity_1["type"] == activity_2["type"]):
             coef_time_1 = activity_1['elapsed_time']/ (activity_1['elapsed_time'] + activity_2['elapsed_time'])
             coef_time_2 = activity_2['elapsed_time']/ (activity_1['elapsed_time'] + activity_2['elapsed_time'])
@@ -399,3 +413,8 @@ def find_activity(id_1, id_2, activity_data):
     # TODO: change join to merge instead (better wording)
     # TODO: Avg pace per time of day --> graph
     # TODO: map of world with photos taken at each location for the activities
+    # TODO: Add regression line to avg speed/HR graph
+    # TODO: add line between dots in monthly distance 
+    # TODO: -- isolate out elevation
+    # TODO: isolate environment - compare metrics with matched rides/activities
+    # TODO: add that if the activities are reloaded in, the graph_data.csv file is deleted so it can be regenerated
