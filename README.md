@@ -7,4 +7,4 @@ This feature allows the user to filter through their activities based on activit
 The ID of the activity is default, and it always shown. There is a link from the ID column to the acitvity on strava.com. Below is an example:
 
 
-<img src="static/images/README/filter1.jpg" alt="drawing" width="200"/>
+<img src="static/images/README/filter1.jpg" alt="drawing" width="400"/>
