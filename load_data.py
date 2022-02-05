@@ -404,7 +404,6 @@ def find_activity(id_1, id_2, activity_data):
     # TODO: option to save output to csv for further analysis
     # TODO: 3 years in sport, compare years --> years in sport
         # per sport total distance, average speed per sport, total elevation gain per sport
-        # each year, different colour, per month distance over 3 years (x axis is months, y axis is distance), per sport
         # histogram of number of 1km runs, 2km runs, etc...
     # TODO: change "--" to "all" when choosing operand and activity
     # TODO: filter based on elevation
