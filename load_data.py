@@ -280,7 +280,7 @@ def hr_graph(df, years, a_type):
     df_line = df_line[df_line.average_heartrate > outliers]
     title = a_type + ": Average Speed to Average HR"
     # trendline="ols"
-    fig = px.scatter(df_line, x="average_speed", y="average_heartrate", color="year", color_discrete_map= {'2018': 'black','2019': '#f7d0b5','2020': "#FC6100",'2021': '#243856','2022': '#909090'})
+    fig = px.scatter(df_line, x="average_speed", y="average_heartrate", color="year", trendline="ols", color_discrete_map= {'2018': 'black','2019': '#f7d0b5','2020': "#FC6100",'2021': '#243856','2022': '#909090'})
     if a_type =='Run':
         x_name = "Avg Speed: min/km"
     else:
