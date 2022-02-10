@@ -62,5 +62,12 @@ After clicking "Submit", the merged map appears with some of the metrics below:
 
 <img src="static/images/README/merge4.jpg" alt="drawing" width="400"/>
 
+## How to run the application
+
+1. Clone the repository
+2. Activate a virtual environment with the dependencies in the requirements.txt file
+	$ pip install -r requirements.txt
+3. Run command "python main.py" and copy the URL that's outputted and paste it in a web browser. 
+
 
 
