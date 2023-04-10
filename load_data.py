@@ -19,10 +19,19 @@ from pathlib import Path
 import polyline
 import folium
 import statsmodels
+from pymongo import MongoClient
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 csv.field_size_limit(sys.maxsize)
+
+
+# client = MongoClient("mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
+# client.strava["activity_data"].update_one({'Device Name ID': "here"},
+#                                                    {'$set': {'Legend Label': "here"}}, upsert=True)
+
+# for i in requests.get("https://www.strava.com/api/v3/athlete/activities?access_token=ba743fe5186a9da5b3f88cd334cd076730c00b6e").json():
+#     client.strava["activity_data"].insert_one(i)
 
 # loads activities from strava, save to txt file
 # function run when user logs in
@@ -30,6 +39,7 @@ def load(id,secret,refresh):
 
     auth_url = "https://www.strava.com/oauth/token"
     activites_url = "https://www.strava.com/api/v3/athlete/activities/"
+    # https://www.strava.com/api/v3/athlete/activities?access_token=ba743fe5186a9da5b3f88cd334cd076730c00b6e
     payload = {
         'client_id': str(id),
         'client_secret': str(secret),
@@ -39,12 +49,15 @@ def load(id,secret,refresh):
     }
 
     res = requests.post(auth_url, data=payload, verify=False)
-    access_token = res.json()['access_token']
+    # access_token = res.json()['access_token']
+    access_token = 'ba743fe5186a9da5b3f88cd334cd076730c00b6e'
     print("Access Token = {}\n".format(access_token))
 
     header = {'Authorization': 'Bearer ' + access_token}
 
     i = 1
+
+
 
     activity_data = []
     # TODO: change this to dynamic (i.e. won't work if user's activities exceed 7 pages - won't include all activities)
@@ -119,56 +132,65 @@ def get_year(date):
 
 # filters activities by criteria specified by user, function run from filtering page
 def distance(dist, type, operand, activity_data, metrics, start_date, end_date):
+    client = MongoClient("mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
     column_names = metrics
     df = pd.DataFrame(columns = column_names)
+    if operand != "--":
+        # cursor = client.strava["activity_data"].find({'distance': {operand: 19000}})
+        cursor = client.strava["activity_data"].find({'type': type})
+        results = list(cursor)
+        print(results)
+        df.append(results)
+        print(df)
+
     # iterate through each page extracted from strava
-    for page in activity_data:
-        # iterate through each activity on page 
-        for i in page:
-            # checks to see if the type of activity matches the user's filter input
-            if i["type"]== type or type == "--":
-                # rounding so that output is to the nearest .1 km for equals operand
-                if operand == "=":
-                    round_dist = round(i["distance"], -2)
-                else:
-                    round_dist = i["distance"]
-                # checks to see if the activity is within the user's specified timeframe(s)
-                if validate_date(format_date(i["start_date_local"]),start_date, end_date):
-                    if check_op(operand, round_dist, dist):
-                        # generating one row in df (i.e. 1 activity)
-                        metric_list = []
-                        # iterate through metrics specified by user (e.g. name of activity)
-                        for m in column_names:
-                            if m == 'distance':
-                                # shows swim in meters but all other activities in km
-                                if type == 'Swim':
-                                    km = str(i["distance"]) + " m"
-                                else:
-                                    km = str(round(i["distance"] / 1000, 2)) + " km"
+    # for page in activity_data:
+    #     # iterate through each activity on page 
+    #     for i in page:
+    #         # checks to see if the type of activity matches the user's filter input
+    #         if i["type"]== type or type == "--":
+    #             # rounding so that output is to the nearest .1 km for equals operand
+    #             if operand == "=":
+    #                 round_dist = round(i["distance"], -2)
+    #             else:
+    #                 round_dist = i["distance"]
+    #             # checks to see if the activity is within the user's specified timeframe(s)
+    #             if validate_date(format_date(i["start_date_local"]),start_date, end_date):
+    #                 if check_op(operand, round_dist, dist):
+    #                     # generating one row in df (i.e. 1 activity)
+    #                     metric_list = []
+    #                     # iterate through metrics specified by user (e.g. name of activity)
+    #                     for m in column_names:
+    #                         if m == 'distance':
+    #                             # shows swim in meters but all other activities in km
+    #                             if type == 'Swim':
+    #                                 km = str(i["distance"]) + " m"
+    #                             else:
+    #                                 km = str(round(i["distance"] / 1000, 2)) + " km"
                                 
-                                metric_list.append(km)
-                            # changing units of moving time from seconds to min
-                            elif m == 'moving_time':
-                                time = str(round(i["moving_time"] / 60, 2)) + " min"
-                                metric_list.append(time)
-                            # show running in min/km, but all other sports in km/h
-                            elif m == 'average_speed':
-                                if i["type"] == "Run":
-                                    if i["distance"] != 0:
-                                        avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
-                                else:
-                                    avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
-                                metric_list.append(avg_speed)  
-                            # show date in YYYY-MM-DD format
-                            elif m == 'start_date_local':
-                                date = format_date(i[m])
-                                metric_list.append(date) 
-                            else:
-                                metric_list.append(i[m])
+    #                             metric_list.append(km)
+    #                         # changing units of moving time from seconds to min
+    #                         elif m == 'moving_time':
+    #                             time = str(round(i["moving_time"] / 60, 2)) + " min"
+    #                             metric_list.append(time)
+    #                         # show running in min/km, but all other sports in km/h
+    #                         elif m == 'average_speed':
+    #                             if i["type"] == "Run":
+    #                                 if i["distance"] != 0:
+    #                                     avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
+    #                             else:
+    #                                 avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
+    #                             metric_list.append(avg_speed)  
+    #                         # show date in YYYY-MM-DD format
+    #                         elif m == 'start_date_local':
+    #                             date = format_date(i[m])
+    #                             metric_list.append(date) 
+    #                         else:
+    #                             metric_list.append(i[m])
                         # insert activity in first row of dataframe
                         # this displays the data from most recent, to least recent
-                        df.loc[df.shape[0]] = metric_list
-    df = df.rename({'start_date_local': 'Date'}, axis=1)
+    # df.loc[df.shape[0]] = metric_list
+    # df = df.rename({'start_date_local': 'Date'}, axis=1)
     return df
 
 # ----------------------------- 

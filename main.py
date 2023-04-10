@@ -37,11 +37,11 @@ def filtering():
     
        operand = request.form.get("selectOp")
        if operand == "greater":
-           operand = ">"
+           operand = "$gt"
        elif operand == "less":
-           operand = "<"
+           operand = "$lt"
        elif operand == "equal":
-           operand = "="
+           operand = "$eq"
        else:
            operand = "--"
 
