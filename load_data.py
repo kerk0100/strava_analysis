@@ -20,23 +20,27 @@ import polyline
 import folium
 import statsmodels
 from pymongo import MongoClient
+from datetime import datetime
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 csv.field_size_limit(sys.maxsize)
 
+client = MongoClient("mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
 
-# client = MongoClient("mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
+
 # client.strava["activity_data"].update_one({'Device Name ID': "here"},
 #                                                    {'$set': {'Legend Label': "here"}}, upsert=True)
 
-# for i in requests.get("https://www.strava.com/api/v3/athlete/activities?access_token=ba743fe5186a9da5b3f88cd334cd076730c00b6e").json():
-#     client.strava["activity_data"].insert_one(i)
+# for i in requests.get("https://www.strava.com/api/v3/athlete/activities?access_token=630143d68935ae5f338ac65a206de35cd2d48493").json():
+#     print(i)
+# client["activity_data"].update(i, upsert=True)
 
 # loads activities from strava, save to txt file
 # function run when user logs in
-def load(id,secret,refresh):
 
+def load(id, secret, refresh):
     auth_url = "https://www.strava.com/oauth/token"
     activites_url = "https://www.strava.com/api/v3/athlete/activities/"
     # https://www.strava.com/api/v3/athlete/activities?access_token=ba743fe5186a9da5b3f88cd334cd076730c00b6e
@@ -50,14 +54,12 @@ def load(id,secret,refresh):
 
     res = requests.post(auth_url, data=payload, verify=False)
     # access_token = res.json()['access_token']
-    access_token = 'ba743fe5186a9da5b3f88cd334cd076730c00b6e'
+    access_token = '7cbcca320898f9c61d4127096ca4c5d1e737cb0e'
     print("Access Token = {}\n".format(access_token))
 
     header = {'Authorization': 'Bearer ' + access_token}
 
     i = 1
-
-
 
     activity_data = []
     # TODO: change this to dynamic (i.e. won't work if user's activities exceed 7 pages - won't include all activities)
@@ -84,7 +86,8 @@ def format_date(date):
     temp = date.split('T')
     return temp[0]
 
-# determines whether an activity is within the specified timeframe(s) (inputted by user) 
+
+# determines whether an activity is within the specified timeframe(s) (inputted by user)
 def validate_date(a_date, s_date, e_date):
     act_date = time.strptime(a_date, "%Y-%m-%d")
     if (s_date == 0 and e_date == 0):
@@ -96,6 +99,7 @@ def validate_date(a_date, s_date, e_date):
     else:
         output = (act_date <= e_date and act_date >= s_date)
     return output
+
 
 # outputs whether the activity meets operand activity (e.g. is distance greater
 # than what the user specified)
@@ -114,12 +118,14 @@ def check_op(operand, round_dist, dist):
         output = op_func(round_dist, dist)
     return output
 
+
 # returns the month from start_date_local key
 def get_month(date):
     f_date = format_date(date)
     month = f_date.split("-")
     m = month[1]
     return m
+
 
 # returns the year from start_date_local key
 def get_year(date):
@@ -128,78 +134,36 @@ def get_year(date):
     y = year[0]
     return y
 
-# ----------------------------- 
+
+# -----------------------------
+
 
 # filters activities by criteria specified by user, function run from filtering page
-def distance(dist, type, operand, activity_data, metrics, start_date, end_date):
-    client = MongoClient("mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
-    column_names = metrics
-    df = pd.DataFrame(columns = column_names)
+def distance(dist, type, operand, column_names, start_date, end_date):
+    client = MongoClient(
+        "mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
+    headers = [x.upper().replace("_", " ") for x in column_names]
+    activity_table = pd.DataFrame(columns=headers)
     if operand != "--":
-        # cursor = client.strava["activity_data"].find({'distance': {operand: 19000}})
         cursor = client.strava["activity_data"].find({'type': type})
         results = list(cursor)
-        print(results)
-        df.append(results)
-        print(df)
 
-    # iterate through each page extracted from strava
-    # for page in activity_data:
-    #     # iterate through each activity on page 
-    #     for i in page:
-    #         # checks to see if the type of activity matches the user's filter input
-    #         if i["type"]== type or type == "--":
-    #             # rounding so that output is to the nearest .1 km for equals operand
-    #             if operand == "=":
-    #                 round_dist = round(i["distance"], -2)
-    #             else:
-    #                 round_dist = i["distance"]
-    #             # checks to see if the activity is within the user's specified timeframe(s)
-    #             if validate_date(format_date(i["start_date_local"]),start_date, end_date):
-    #                 if check_op(operand, round_dist, dist):
-    #                     # generating one row in df (i.e. 1 activity)
-    #                     metric_list = []
-    #                     # iterate through metrics specified by user (e.g. name of activity)
-    #                     for m in column_names:
-    #                         if m == 'distance':
-    #                             # shows swim in meters but all other activities in km
-    #                             if type == 'Swim':
-    #                                 km = str(i["distance"]) + " m"
-    #                             else:
-    #                                 km = str(round(i["distance"] / 1000, 2)) + " km"
-                                
-    #                             metric_list.append(km)
-    #                         # changing units of moving time from seconds to min
-    #                         elif m == 'moving_time':
-    #                             time = str(round(i["moving_time"] / 60, 2)) + " min"
-    #                             metric_list.append(time)
-    #                         # show running in min/km, but all other sports in km/h
-    #                         elif m == 'average_speed':
-    #                             if i["type"] == "Run":
-    #                                 if i["distance"] != 0:
-    #                                     avg_speed = str(round((i["moving_time"] / i["distance"]) * (50/3), 2)) + " min/km"
-    #                             else:
-    #                                 avg_speed = str(round(i["average_speed"] * 3.6, 2)) + " km/h"
-    #                             metric_list.append(avg_speed)  
-    #                         # show date in YYYY-MM-DD format
-    #                         elif m == 'start_date_local':
-    #                             date = format_date(i[m])
-    #                             metric_list.append(date) 
-    #                         else:
-    #                             metric_list.append(i[m])
-                        # insert activity in first row of dataframe
-                        # this displays the data from most recent, to least recent
-    # df.loc[df.shape[0]] = metric_list
-    # df = df.rename({'start_date_local': 'Date'}, axis=1)
-    return df
+        for result in results:
+            activity = {}
+            for header, column in zip(headers, column_names):
+                activity[header] = result[str(column)]
+            activity_table = activity_table.append(activity, ignore_index=True)
+    return activity_table
 
-# ----------------------------- 
+
+# -----------------------------
 def get_data():
     # load activities from txt file
     with open('static/data/data.txt', 'rb') as f:
         activities = pickle.load(f)
-    column_names = ["id","name", "type", "distance", "month", "year", "total_elevation_gain", "has_heartrate", "average_heartrate", "average_speed", "moving_time"]
-    df = pd.DataFrame(columns = column_names)
+    column_names = ["id", "name", "type", "distance", "month", "year", "total_elevation_gain", "has_heartrate",
+                    "average_heartrate", "average_speed", "moving_time"]
+    df = pd.DataFrame(columns=column_names)
 
     # iterate through each page of activities
     for page in activities:
@@ -210,7 +174,7 @@ def get_data():
                 if m == "month":
                     month = get_month(i["start_date_local"])
                     metric_list.append(month)
-                elif m =="year":
+                elif m == "year":
                     year = get_year(i["start_date_local"])
                     metric_list.append(year)
                 elif m == "distance":
@@ -227,6 +191,7 @@ def get_data():
                     metric_list.append(i[m])
             df.loc[df.shape[0]] = metric_list
     return df
+
 
 # trying a different way to filter data
 # loads data into df, then filters to build graph
@@ -247,7 +212,7 @@ def graph_data(year_list, a_type):
     else:
         df_line = df_t
     df_line = df_line.astype({"year": str, "month": str})
-    df_graph = pd.DataFrame(columns = ["year", "month", "distance"])
+    df_graph = pd.DataFrame(columns=["year", "month", "distance"])
     # years that user specified (graphs.html)
     years = year_list
     for y in years:
@@ -258,11 +223,19 @@ def graph_data(year_list, a_type):
             total = df_temp["distance"].sum()
             temp_list = [y, mon, total]
             df_graph.loc[df_graph.shape[0]] = temp_list
+
+
+    datestring = "2023-04-17T19:32:47Z"
+    dt = datetime.strptime(datestring, '%Y-%m-%dT%H:%M:%SZ')
+    print(dt.year, dt.month, dt.day)
     title = a_type + ": Distance per month, separated by year"
-    fig = px.scatter(df_graph, x="month", y="distance", color="year", color_discrete_map= {'2018': 'black','2019': '#f7d0b5','2020': "#FC6100",'2021': '#243856','2022': '#909090'})
-    
+    # need a df with year, month and distance as columns with the data from the types selected
+    fig = px.scatter(df_graph, x="month", y="distance", color="year",
+                     color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#FC6100", '2021': '#243856',
+                                         '2022': '#909090'})
+
     fig.update_traces(marker=dict(size=20),
-                  selector=dict(mode='markers'))
+                      selector=dict(mode='markers'))
     fig.update_layout(title_text=title, title_x=0.5)
 
     hr_speed_graph = hr_graph(df, years, a_type)
@@ -274,7 +247,7 @@ def graph_data(year_list, a_type):
 
 
 def year_dist_graph(df_line, years, a_type):
-    df_graph = pd.DataFrame(columns = ["year", "distance"])
+    df_graph = pd.DataFrame(columns=["year", "distance"])
     for y in years:
         temp = df_line
         df_temp = temp.loc[df_line['year'] == y]
@@ -282,9 +255,12 @@ def year_dist_graph(df_line, years, a_type):
         temp_list = [y, total]
         df_graph.loc[df_graph.shape[0]] = temp_list
     title = a_type + ": Distance per year"
-    fig = px.bar(df_graph, x="distance", y="year", orientation='h', color="year", color_discrete_map= {'2018': 'black','2019': '#f7d0b5','2020': "#FC6100",'2021': '#243856','2022': '#909090'})
+    fig = px.bar(df_graph, x="distance", y="year", orientation='h', color="year",
+                 color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#FC6100", '2021': '#243856',
+                                     '2022': '#909090'})
     fig.update_layout(title_text=title, title_x=0.5)
     return fig
+
 
 def hr_graph(df, years, a_type):
     pio.templates.default = "plotly_white"
@@ -302,13 +278,17 @@ def hr_graph(df, years, a_type):
     df_line = df_line[df_line.average_heartrate > outliers]
     title = a_type + ": Average Speed to Average HR"
     # trendline="ols"
-    fig = px.scatter(df_line, x="average_speed", y="average_heartrate", color="year", trendline="ols", color_discrete_map= {'2018': 'black','2019': '#f7d0b5','2020': "#FC6100",'2021': '#243856','2022': '#909090'})
-    if a_type =='Run':
+    fig = px.scatter(df_line, x="average_speed", y="average_heartrate", color="year", trendline="ols",
+                     color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#FC6100", '2021': '#243856',
+                                         '2022': '#909090'})
+    if a_type == 'Run':
         x_name = "Avg Speed: min/km"
     else:
         x_name = "Avg Speed: km/h"
     fig.update_layout(xaxis_title=x_name, yaxis_title="Avg HR", title_text=title, title_x=0.5)
     return fig
+
+
 # TODO: fix! not accurately calculating pace... :(
 def speed_units(df_line, a_type):
     if a_type == 'Run':
@@ -317,11 +297,13 @@ def speed_units(df_line, a_type):
         df_line["average_speed"] = df_line["average_speed"].apply(lambda x: x * (3.6))
     return df_line
 
+
 def speed_func(x):
     if x != 0:
-        return 1/x * (50/3)
+        return 1 / x * (50 / 3)
     else:
         return 0
+
 
 def find_activity(id_1, id_2, activity_data):
     activity_1 = 0
@@ -332,7 +314,7 @@ def find_activity(id_1, id_2, activity_data):
         # iterate through each activity on page 
         for i in page:
             # checks to see if the type of activity matches the user's filter input
-            if str(i["id"])== id_1:
+            if str(i["id"]) == id_1:
                 activity_1 = i
             if str(i["id"]) == id_2:
                 activity_2 = i
@@ -341,15 +323,16 @@ def find_activity(id_1, id_2, activity_data):
         # TODO: check if its a ride or a run, then add metrics accordingly
         if (abs(activity_1["end_latlng"][0] - activity_2["start_latlng"][0]) < 0.001) and \
                 (abs(activity_1["end_latlng"][1] - activity_2["start_latlng"][1]) < 0.001) and \
-                    (activity_1["type"] == activity_2["type"]):
-            coef_time_1 = activity_1['elapsed_time']/ (activity_1['elapsed_time'] + activity_2['elapsed_time'])
-            coef_time_2 = activity_2['elapsed_time']/ (activity_1['elapsed_time'] + activity_2['elapsed_time'])
+                (activity_1["type"] == activity_2["type"]):
+            coef_time_1 = activity_1['elapsed_time'] / (activity_1['elapsed_time'] + activity_2['elapsed_time'])
+            coef_time_2 = activity_2['elapsed_time'] / (activity_1['elapsed_time'] + activity_2['elapsed_time'])
 
             print(coef_time_1)
             print(coef_time_2)
             activity_1['name'] = activity_1["name"] + " + " + activity_2["name"]
             activity_1['athlete_count'] = max(activity_1['athlete_count'], activity_2['athlete_count'])
-            metrics = ['distance', 'moving_time', 'elapsed_time', 'total_elevation_gain', 'achievement_count', 'kudos_count', 'comment_count','photo_count', 'pr_count', 'total_photo_count']
+            metrics = ['distance', 'moving_time', 'elapsed_time', 'total_elevation_gain', 'achievement_count',
+                       'kudos_count', 'comment_count', 'photo_count', 'pr_count', 'total_photo_count']
             for m in metrics:
                 activity_1[m] += activity_2[m]
 
@@ -357,24 +340,24 @@ def find_activity(id_1, id_2, activity_data):
             for am in avg_metrics:
                 try:
                     if am == 'average_heartrate':
-                        if activity_1['has_heartrate'] == False and activity_2['has_heartrate'] == False :
+                        if activity_1['has_heartrate'] == False and activity_2['has_heartrate'] == False:
                             continue
                         if activity_1['has_heartrate'] == False:
                             activity_1['has_heartrate'] = activity_2['has_heartrate']
                         if activity_2['has_heartrate'] == False:
                             activity_1['has_heartrate'] = activity_1['has_heartrate']
                         else:
-                            activity_1[am] = coef_time_1*activity_1[am] + coef_time_2*activity_2[am]
+                            activity_1[am] = coef_time_1 * activity_1[am] + coef_time_2 * activity_2[am]
                         activity_1['max_heartrate'] = max(activity_1['max_heartrate'], activity_2['max_heartrate'])
                     else:
-                        activity_1[am] = coef_time_1*activity_1[am] + coef_time_2*activity_2[am]
+                        activity_1[am] = coef_time_1 * activity_1[am] + coef_time_2 * activity_2[am]
                 except:
                     continue
             if activity_1['elev_high']:
                 activity_1['elev_high'] = max(activity_1['elev_high'], activity_2['elev_high'])
             if activity_1['elev_low']:
                 activity_1['elev_low'] = min(activity_1['elev_low'], activity_2['elev_low'])
-            
+
             map_1 = activity_1['map']['summary_polyline']
             map_2 = activity_2['map']['summary_polyline']
             poly_decode_1 = polyline.decode(map_1)
@@ -395,38 +378,38 @@ def find_activity(id_1, id_2, activity_data):
                     min_lon = l[0]
                 sum_lat += l[0]
                 sum_lon += l[1]
-            avg_lat = sum_lat/count
-            avg_lon = sum_lon/count
+            avg_lat = sum_lat / count
+            avg_lon = sum_lon / count
             m = folium.Map(location=[avg_lat, avg_lon], zoom_start=11)
 
             loc = poly_decode
 
             folium.PolyLine(loc,
-                            color= '#FC6100',
+                            color='#FC6100',
                             weight=5,
                             opacity=1).add_to(m)
             folium.TileLayer('Stamen Terrain').add_to(m)
 
-            act_list = [activity_1['name'], 'Distance: ' + str(activity_1['distance']/1000) + ' km', 'Elev. gain: ' + str(activity_1['total_elevation_gain']) + ' m', 'Avg HR: ' + str(round(activity_1['average_heartrate'],2)) + ' bpm']
+            act_list = [activity_1['name'], 'Distance: ' + str(activity_1['distance'] / 1000) + ' km',
+                        'Elev. gain: ' + str(activity_1['total_elevation_gain']) + ' m',
+                        'Avg HR: ' + str(round(activity_1['average_heartrate'], 2)) + ' bpm']
 
-            #{'id': 6468508817, 'upload_id': 6877595631, 'upload_id_str': '6877595631', 'external_id': '61d37417b30fe6795f7ad43e.fit'}
-            #{'id': 6468509184, 'upload_id': 6877596021, 'upload_id_str': '6877596021', 'external_id': '61d3741dff187d526c7a936d.fit'}
+            # {'id': 6468508817, 'upload_id': 6877595631, 'upload_id_str': '6877595631', 'external_id': '61d37417b30fe6795f7ad43e.fit'}
+            # {'id': 6468509184, 'upload_id': 6877596021, 'upload_id_str': '6877596021', 'external_id': '61d3741dff187d526c7a936d.fit'}
             return m, act_list
         else:
             result = "Not Correct"
             return result
-            
+
     else:
         result = "The id value(s) entered are not valid. Please try again. Use the filtering page to find the correct activity ID."
-        return result    
+        return result
 
-
-
-# List of TODOs:
+    # List of TODOs:
     # TODO: option to save output to csv for further analysis
     # TODO: 3 years in sport, compare years --> years in sport
-        # per sport total distance, average speed per sport, total elevation gain per sport
-        # histogram of number of 1km runs, 2km runs, etc...
+    # per sport total distance, average speed per sport, total elevation gain per sport
+    # histogram of number of 1km runs, 2km runs, etc...
     # TODO: change "--" to "all" when choosing operand and activity
     # TODO: filter based on elevation
     # TODO: fix running pace, decimal places, right now they are in 100 -> convert to 60 (divide by 60)

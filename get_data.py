@@ -30,12 +30,12 @@ def get_token():
 
     return data
 
+
 if not os.path.exists('./strava_tokens.json'):
     request_url = f'http://www.strava.com/oauth/authorize?client_id={client_id}' \
                   f'&response_type=code&redirect_uri={redirect_uri}' \
                   f'&approval_prompt=force' \
                   f'&scope=profile:read_all,activity:read_all'
-
 
     print('Click here:', request_url)
     print('Please authorize the app and copy&paste below the generated code!')
