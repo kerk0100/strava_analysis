@@ -33,12 +33,12 @@ while True:
         activity = i
         if activity['type'] != "Swim":
             activity['distance'] = int(activity['distance'])/1000
-        activity["date"] = activity.pop("start_date_local")
-        dt = datetime.strptime(activity['date'], '%Y-%m-%dT%H:%M:%SZ')
-        activity["date"] = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
-        activity["month"] = dt.month
-        activity["year"] = dt.year
-        activity["day"] = dt.day
+        activity["date"] = datetime.strptime(activity.pop("start_date_local"), '%Y-%m-%dT%H:%M:%SZ')
+        # dt = datetime.strptime(activity['date'], '%Y-%m-%dT%H:%M:%SZ')
+        # activity["date"] = str(dt.year) + "-" + str(dt.month) + "-" + str(dt.day)
+        # activity["month"] = dt.month
+        # activity["year"] = dt.year
+        # activity["day"] = dt.day
         client.strava["activity_data"].update_one({'id': activity['id']}, {'$set': activity}, upsert=True)
         client.strava["activity_data"].update_many({}, {"$unset": {'start_date': 1, 'start_date_local': 1}}, upsert=True)
 

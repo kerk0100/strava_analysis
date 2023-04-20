@@ -52,7 +52,7 @@ def filtering():
 
         try:
             try:
-                dist = int(request.form.get("other_dist")) * 1000
+                dist = int(request.form.get("other_dist"))
             except:
                 dist = int(request.form.get("swim_dist"))
         except:

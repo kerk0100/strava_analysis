@@ -21,7 +21,7 @@ import folium
 import statsmodels
 from pymongo import MongoClient
 from datetime import datetime
-
+import math
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -140,12 +140,11 @@ def get_year(date):
 
 # filters activities by criteria specified by user, function run from filtering page
 def distance(dist, type, operand, column_names, start_date, end_date):
-    client = MongoClient(
-        "mongodb+srv://strava:stravaApp@cluster0.gkglgwv.mongodb.net/strava?retryWrites=true&w=majority")
     headers = [x.upper().replace("_", " ") for x in column_names]
     activity_table = pd.DataFrame(columns=headers)
+
     if operand != "--":
-        cursor = client.strava["activity_data"].find({'type': type})
+        cursor = client.strava["activity_data"].find({'type': type, 'distance': {operand: dist}})
         results = list(cursor)
 
         for result in results:
@@ -153,6 +152,8 @@ def distance(dist, type, operand, column_names, start_date, end_date):
             for header, column in zip(headers, column_names):
                 activity[header] = result[str(column)]
             activity_table = activity_table.append(activity, ignore_index=True)
+    activity_table['AVERAGE SPEED'] = activity_table['AVERAGE SPEED'].apply(lambda x: str(round(math.floor(1/(x*0.06)) +
+                                                                                                float("0." + str(1/(x*0.06)).split('.')[1])*60/100, 2)) + ' min/km' if x > 0 else x)
     return activity_table
 
 
@@ -193,94 +194,85 @@ def get_data():
     return df
 
 
-# trying a different way to filter data
 # loads data into df, then filters to build graph
-def graph_data(year_list, a_type):
-    pio.templates.default = "plotly_white"
-    data_file = Path("static/data/graph_df.csv")
-    if data_file.exists() == False:
-        df = get_data()
-        df.to_csv("static/data/graph_df.csv", index=False)
-        months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
-    else:
-        df = pd.read_csv("static/data/graph_df.csv")
-        months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-
-    df_t = df[["year", "month", "type", "distance"]]
+def graph_data(years, a_type):
+    years = [datetime.strptime(y, '%Y').year for y in years]
+    pio.templates.default = "simple_white"
+    distance_sums = list(client.strava['activity_data'].aggregate([{'$group': {'_id': {'month': {'$month': "$date"},
+                                                                                       'year': {'$year': "$date"},
+                                                                                       'type': '$type'},
+                                                                               'distance': {'$sum': "$distance"}}}]))
+    distance_sums = pd.DataFrame(distance_sums)
+    distance_sums = pd.concat([distance_sums.drop(['_id'], axis=1), distance_sums['_id'].apply(pd.Series)], axis=1)
+    distance_sums = distance_sums[distance_sums['type'] != 'Swim']
+    distance_sums = distance_sums[distance_sums['year'].isin(years)]
     if a_type != "All":
-        df_line = df_t[(df_t["type"] == a_type)]
-    else:
-        df_line = df_t
-    df_line = df_line.astype({"year": str, "month": str})
-    df_graph = pd.DataFrame(columns=["year", "month", "distance"])
-    # years that user specified (graphs.html)
-    years = year_list
-    for y in years:
-        for mon in months:
-            temp = df_line
-            df_temp = temp.loc[df_line['year'] == y]
-            df_temp = df_temp.loc[df_line['month'] == mon]
-            total = df_temp["distance"].sum()
-            temp_list = [y, mon, total]
-            df_graph.loc[df_graph.shape[0]] = temp_list
+        distance_sums = distance_sums[distance_sums['type'] == a_type]
+        distance_sums = distance_sums.drop('type', axis=1)
+    distance_sums['year'] = distance_sums['year'].astype('str')
 
+    hr_data = list(client.strava['activity_data'].find({}, {'year': {'$year': "$date"}, "type": '$type',
+                                                            "average_heartrate": '$average_heartrate',
+                                                            "average_speed": '$average_speed',
+                                                            "moving_time": '$moving_time',
+                                                            "distance": '$distance'}))
+    hr_data = pd.DataFrame(hr_data)
+    hr_data = hr_data[hr_data['year'].isin(years)]
+    hr_data['year'] = hr_data['year'].astype('str')
+    if a_type != "All":
+        hr_data = hr_data[hr_data['type'] == a_type]
+        hr_data = hr_data.drop('type', axis=1)
 
-    datestring = "2023-04-17T19:32:47Z"
-    dt = datetime.strptime(datestring, '%Y-%m-%dT%H:%M:%SZ')
-    print(dt.year, dt.month, dt.day)
+    year_sums = list(client.strava['activity_data'].aggregate(
+        [{'$group': {'_id': {'year': {'$year': "$date"}, 'type': '$type'}, 'distance': {'$sum': "$distance"}}}]))
+    year_sums = pd.DataFrame(year_sums)
+    year_sums = pd.concat([year_sums.drop(['_id'], axis=1), year_sums['_id'].apply(pd.Series)], axis=1)
+    year_sums = year_sums[year_sums['year'].isin(years)]
+    year_sums = year_sums[year_sums['type'] != 'Swim']
+    if a_type != "All":
+        year_sums = year_sums[year_sums['type'] == a_type]
+    year_sums['year'] = year_sums['year'].astype('str')
+
     title = a_type + ": Distance per month, separated by year"
-    # need a df with year, month and distance as columns with the data from the types selected
-    fig = px.scatter(df_graph, x="month", y="distance", color="year",
-                     color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#FC6100", '2021': '#243856',
-                                         '2022': '#909090'})
+    fig = px.scatter(distance_sums, x="month", y="distance", color="year", color_discrete_map={'2018': '#000000',
+                                                                                               '2019': '#f7d0b5',
+                                                                                               '2020': "#642C20",
+                                                                                               '2021': '#243856',
+                                                                                               '2022': '#909090',
+                                                                                               '2023': '#FC6100'})
 
     fig.update_traces(marker=dict(size=20),
                       selector=dict(mode='markers'))
     fig.update_layout(title_text=title, title_x=0.5)
 
-    hr_speed_graph = hr_graph(df, years, a_type)
-    bar_fig = year_dist_graph(df_line, years, a_type)
+    hr_speed_graph = hr_graph(hr_data, a_type)
+    year_graph = year_dist_graph(year_sums, a_type)
+
     heart_rate_graph = plot(hr_speed_graph, output_type='div')
-    bar_graph = plot(bar_fig, output_type='div')
+    bar_graph = plot(year_graph, output_type='div')
     graph = plot(fig, output_type='div')
     return graph, bar_graph, heart_rate_graph
 
 
-def year_dist_graph(df_line, years, a_type):
-    df_graph = pd.DataFrame(columns=["year", "distance"])
-    for y in years:
-        temp = df_line
-        df_temp = temp.loc[df_line['year'] == y]
-        total = df_temp["distance"].sum()
-        temp_list = [y, total]
-        df_graph.loc[df_graph.shape[0]] = temp_list
+def year_dist_graph(year_sums, a_type):
     title = a_type + ": Distance per year"
-    fig = px.bar(df_graph, x="distance", y="year", orientation='h', color="year",
-                 color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#FC6100", '2021': '#243856',
-                                     '2022': '#909090'})
+    fig = px.bar(year_sums, x="distance", y="year", orientation='h', color="year",
+                 color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#642C20", '2021': '#243856',
+                                     '2022': '#909090', '2023': '#FC6100'})
     fig.update_layout(title_text=title, title_x=0.5)
     return fig
 
 
-def hr_graph(df, years, a_type):
+def hr_graph(df, a_type):
     pio.templates.default = "plotly_white"
-    df_t = df[["year", "type", "average_heartrate", "average_speed", "moving_time", "distance"]]
-    if a_type != "All":
-        df_line = df_t[(df_t["type"] == a_type)]
-        df_line = speed_units(df_line, a_type)
-    else:
-        df_line = df_t
-    df_line = df_line.astype({"year": str})
-    df_line = df_line[df_line['year'].isin(years)]
-    # df_line = df_line[df_line.average_heartrate != 0]
-    df_line = df_line[df_line.average_speed != 0]
-    outliers = df_line.average_heartrate.quantile(0.32)
-    df_line = df_line[df_line.average_heartrate > outliers]
+    df = df[df.average_speed != 0]
+    outliers = df.average_heartrate.quantile(0.32)
+    df = df[df.average_heartrate > outliers]
     title = a_type + ": Average Speed to Average HR"
     # trendline="ols"
-    fig = px.scatter(df_line, x="average_speed", y="average_heartrate", color="year", trendline="ols",
-                     color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#FC6100", '2021': '#243856',
-                                         '2022': '#909090'})
+    fig = px.scatter(df, x="average_speed", y="average_heartrate", color="year", trendline="ols",
+                     color_discrete_map={'2018': 'black', '2019': '#f7d0b5', '2020': "#642C20", '2021': '#243856',
+                                         '2022': '#909090', '2023': '#FC6100'})
     if a_type == 'Run':
         x_name = "Avg Speed: min/km"
     else:

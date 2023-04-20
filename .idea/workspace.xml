@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d69d111d-9425-4403-84c1-421d237c1620" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/add_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/add_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/add_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/load_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/load_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strava_tokens.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/filtering.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/filtering.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/graphs.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/graphs.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
