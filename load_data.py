@@ -143,56 +143,27 @@ def distance(dist, type, operand, column_names, start_date, end_date):
     headers = [x.upper().replace("_", " ") for x in column_names]
     activity_table = pd.DataFrame(columns=headers)
 
+    # change to filter for all types if no specific type is chosen
     if operand != "--":
-        cursor = client.strava["activity_data"].find({'type': type, 'distance': {operand: dist}})
-        results = list(cursor)
+        cursor = client.strava["activity_data"].find({'type': type, 'distance': {operand: dist}}).sort('date', -1)
+    else:
+        cursor = client.strava["activity_data"].find({'type': type}).sort('date', -1)
 
-        for result in results:
-            activity = {}
-            for header, column in zip(headers, column_names):
-                activity[header] = result[str(column)]
-            activity_table = activity_table.append(activity, ignore_index=True)
-    activity_table['AVERAGE SPEED'] = activity_table['AVERAGE SPEED'].apply(lambda x: str(round(math.floor(1/(x*0.06)) +
-                                                                                                float("0." + str(1/(x*0.06)).split('.')[1])*60/100, 2)) + ' min/km' if x > 0 else x)
+    results = list(cursor)
+
+    for result in results:
+        activity = {}
+        for header, column in zip(headers, column_names):
+            activity[header] = result[str(column)]
+        activity_table = activity_table.append(activity, ignore_index=True)
+    try:
+        activity_table['AVERAGE SPEED'] = activity_table['AVERAGE SPEED'] \
+            .apply(
+            lambda x: str(round(math.floor(1 / (x * 0.06)) + float("0." + str(1 / (x * 0.06)).split('.')[1]) * 60 / 100, 2))
+                      + ' min/km' if x > 0 else x)
+    except:
+        print('Average Speed was not a selected column.')
     return activity_table
-
-
-# -----------------------------
-def get_data():
-    # load activities from txt file
-    with open('static/data/data.txt', 'rb') as f:
-        activities = pickle.load(f)
-    column_names = ["id", "name", "type", "distance", "month", "year", "total_elevation_gain", "has_heartrate",
-                    "average_heartrate", "average_speed", "moving_time"]
-    df = pd.DataFrame(columns=column_names)
-
-    # iterate through each page of activities
-    for page in activities:
-        # iterate through each activity on page
-        for i in page:
-            metric_list = []
-            for m in column_names:
-                if m == "month":
-                    month = get_month(i["start_date_local"])
-                    metric_list.append(month)
-                elif m == "year":
-                    year = get_year(i["start_date_local"])
-                    metric_list.append(year)
-                elif m == "distance":
-                    # save distance in km not m
-                    dist = i["distance"] / 1000
-                    metric_list.append(dist)
-                elif m == "average_heartrate":
-                    if i["has_heartrate"] == False:
-                        avg_hr = 0
-                    else:
-                        avg_hr = i["average_heartrate"]
-                    metric_list.append(avg_hr)
-                else:
-                    metric_list.append(i[m])
-            df.loc[df.shape[0]] = metric_list
-    return df
-
 
 # loads data into df, then filters to build graph
 def graph_data(years, a_type):
@@ -279,22 +250,6 @@ def hr_graph(df, a_type):
         x_name = "Avg Speed: km/h"
     fig.update_layout(xaxis_title=x_name, yaxis_title="Avg HR", title_text=title, title_x=0.5)
     return fig
-
-
-# TODO: fix! not accurately calculating pace... :(
-def speed_units(df_line, a_type):
-    if a_type == 'Run':
-        df_line["average_speed"] = df_line["average_speed"].apply(speed_func)
-    else:
-        df_line["average_speed"] = df_line["average_speed"].apply(lambda x: x * (3.6))
-    return df_line
-
-
-def speed_func(x):
-    if x != 0:
-        return 1 / x * (50 / 3)
-    else:
-        return 0
 
 
 def find_activity(id_1, id_2, activity_data):
